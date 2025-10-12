@@ -1,0 +1,44 @@
+def save_to_markdown(self, papers, filename='report.md'):
+    """
+    Создает красивый отчет в формате Markdown с AI summaries.
+    """
+    if not papers:
+        print("Нет данных для сохранения в Markdown отчете.")
+        return
+
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(f"# 🤖 ArXiv AI Research Digest\n\n")
+        f.write(f"**Total papers found:** {len(papers)}\n")
+        f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"**Search query:** LLM + Prompt Engineering + Evaluation\n\n")
+        f.write("---\n\n")
+
+        sorted_papers = sorted(papers, key=lambda x: x['published_date'], reverse=True)
+
+        for i, paper in enumerate(sorted_papers, 1):
+            f.write(f"## 📄 {i}. {paper['title']}\n\n")
+            
+            f.write(f"**👥 Authors:** {', '.join(paper['authors'][:3])}")  # Перші 3 автори
+            if len(paper['authors']) > 3:
+                f.write(f" *et al. ({len(paper['authors'])} total)*")
+            f.write("\n\n")
+            
+            f.write(f"**📅 Published:** {paper['published_date']}\n")
+            f.write(f"**🏷️ Category:** {paper['primary_category']}\n")
+            f.write(f"**🔗 PDF:** [{paper['entry_id']}]({paper['pdf_url']})\n\n")
+            
+            # AI Summary (якщо є)
+            if paper.get('ai_summary'):
+                f.write(f"### 🤖 AI Summary\n")
+                f.write(f"{paper['ai_summary']}\n\n")
+            
+            # Повний abstract у спойлері (опціонально)
+            f.write(f"<details>\n")
+            f.write(f"<summary>📖 <b>Full Abstract</b> (click to expand)</summary>\n\n")
+            summary = paper['summary'].replace('\n', ' ')
+            f.write(f"{summary}\n\n")
+            f.write(f"</details>\n\n")
+            
+            f.write("---\n\n")
+    
+    print(f"💾 Отчет в формате Markdown сохранен в {filename}")
